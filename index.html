@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Sirisha ✨</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bmwBlue: '#0066B1',
+                        bmwDarkNavy: '#000B1A',
+                        bmwNavy: '#001738',
+                        bmwRoyal: '#002663',
+                        ivoryCream: '#FAF0E6',
+                        goldLeaf: '#D4AF37'
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at 50% 35%, #001f4d 0%, #000b1a 80%);
+            color: #FAF0E6;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* STABLE FLAMES: Locked in position, only vertical breathing pulse */
+        .flame-group {
+            transform-origin: center bottom;
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+            animation: flame-pulse 1.6s ease-in-out infinite;
+        }
+        .flame-inner { transform-origin: center bottom; }
+        .flame-outer-glow {
+            transform-origin: center center;
+            animation: flame-glow 1.5s ease-in-out infinite;
+        }
+        .blue-flame-pulse {
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: blue-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes flame-pulse {
+            0%, 100% { transform: scale(1, 1); filter: brightness(0.96); }
+            50% { transform: scale(0.97, 1.06); filter: brightness(1.1); }
+        }
+        @keyframes flame-glow {
+            0%, 100% { opacity: 0.45; transform: scale(0.95); }
+            50% { opacity: 0.75; transform: scale(1.08); }
+        }
+        @keyframes blue-pulse {
+            0%, 100% { opacity: 0.2; transform: scale(0.75); }
+            50% { opacity: 0.5; transform: scale(1.15); }
+        }
+
+        /* Smoke Physics Simulation */
+        .smoke-particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(220, 225, 235, 0.7) 0%, rgba(180, 190, 205, 0) 70%);
+            animation: smoke-rise 2.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        @keyframes smoke-rise {
+            0% {
+                opacity: 0.75;
+                transform: translate(-50%, 0) scale(0.4) rotate(0deg);
+                filter: blur(2px);
+            }
+            50% {
+                opacity: 0.4;
+                transform: translate(calc(-50% + var(--drift-x)), -40px) scale(1.5) rotate(15deg);
+                filter: blur(5px);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--drift-x) * 1.8), -90px) scale(2.8) rotate(-20deg);
+                filter: blur(9px);
+            }
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(212, 175, 55, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 102, 177, 0.35);
+        }
+
+        .letter-card {
+            background: #FFFFFF;
+            color: #000B1A;
+            box-shadow: 0 25px 70px -15px rgba(0, 0, 0, 0.75), 0 0 40px rgba(0, 102, 177, 0.2);
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000B1A; }
+        ::-webkit-scrollbar-thumb { background: #0066B1; border-radius: 3px; }
+    </style>
+</head>
+<body class="flex flex-col justify-between items-center relative min-h-screen selection:bg-bmwBlue selection:text-white">
+
+    <header class="w-full max-w-5xl px-6 py-6 flex justify-between items-center z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-2.5 h-2.5 rounded-full bg-bmwBlue animate-pulse"></div>
+            <span class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-200/80">WAITTTT 😭🎉 IT’S YOUR BIRTHDAYYYYY?! 🥳🎂🎈✨</span>
+        </div>
+    </header>
+
+    <main class="w-full max-w-4xl px-4 py-4 flex-grow flex flex-col justify-center items-center relative z-10">
+        
+        <!-- PAGE 1: CAKE & BLOW -->
+        <section id="page1" class="w-full flex flex-col items-center justify-center text-center space-y-6 transition-all duration-1000">
+            <div class="space-y-2 max-w-xl">
+                <span class="text-xs uppercase tracking-[0.3em] font-semibold text-blue-400">Make A Wish</span>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
+                    Blow Out The Candles
+                </h1>
+                </p>
+            </div>
+
+            <!-- CAKE SVG -->
+            <div class="relative my-2 flex justify-center items-center select-none">
+                <svg id="cakeSvg" width="380" height="380" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_25px_45px_rgba(0,0,0,0.85)] max-w-full h-auto">
+                    <ellipse cx="190" cy="338" rx="145" ry="18" fill="url(#standShadowGlow)" opacity="0.8"/>
+                    <path d="M 120 338 Q 190 348 260 338 L 240 330 Q 190 338 140 330 Z" fill="url(#goldPedestalGrad)"/>
+                    <ellipse cx="190" cy="330" rx="50" ry="8" fill="url(#goldFoil)"/>
+                    <path d="M 175 330 L 178 290 Q 190 293 202 290 L 205 330 Z" fill="url(#silverStem)"/>
+                    <ellipse cx="190" cy="292" rx="150" ry="24" fill="url(#plateRimGrad)"/>
+                    <ellipse cx="190" cy="289" rx="148" ry="22" fill="#FFFFFF"/>
+                    <ellipse cx="190" cy="289" rx="144" ry="20" fill="url(#glassReflection)"/>
+
+                    <!-- TIER 3 -->
+                    <ellipse cx="190" cy="280" rx="118" ry="16" fill="#000914" opacity="0.4"/>
+                    <path d="M 72 200 L 72 272 Q 190 300 308 272 L 308 200 Q 190 225 72 200 Z" fill="url(#ivoryCreamGrad)"/>
+                    <ellipse cx="190" cy="200" rx="118" ry="20" fill="#FFFDF5"/>
+                    <path d="M 72 260 Q 190 288 308 260 L 308 268 Q 190 296 72 268 Z" fill="url(#royalBlueRibbon)"/>
+                    <path d="M 72 258 Q 190 286 308 258 L 308 261 Q 190 289 72 261 Z" fill="url(#goldFoil)"/>
+
+                    <!-- TIER 2 -->
+                    <path d="M 98 135 L 98 192 Q 190 216 282 192 L 282 135 Q 190 156 98 135 Z" fill="url(#royalBlueVelvet)"/>
+                    <ellipse cx="190" cy="135" rx="92" ry="16" fill="#002D72"/>
+                    <ellipse cx="190" cy="135" rx="90" ry="14" stroke="url(#goldFoil)" stroke-width="2.5" stroke-dasharray="6 4" fill="none"/>
+
+                    <!-- TIER 1 -->
+                    <path d="M 124 78 L 124 128 Q 190 148 256 128 L 256 78 Q 190 96 124 78 Z" fill="url(#ivoryCreamGrad)"/>
+                    <ellipse cx="190" cy="78" rx="66" ry="12" fill="#FFFDF0"/>
+                    <path d="M 124 122 Q 190 142 256 122 L 256 126 Q 190 146 124 126 Z" fill="url(#royalBlueRibbon)"/>
+
+                    <!-- CANDLES & STABLE FLAMES -->
+                    <g id="candleContainer1" transform="translate(150, 42)">
+                        <path d="M 0 5 L 6 5 L 6 38 L 0 38 Z" fill="url(#candleBodyGrad)"/>
+                        <line x1="3" y1="5" x2="3" y2="-1" stroke="#222" stroke-width="1.2" stroke-linecap="round"/>
+                        <g id="flameGroup1" class="flame-group" transform="translate(3, -1)">
+                            <ellipse class="flame-outer-glow" cx="0" cy="-6" rx="14" ry="18" fill="url(#flameAura)" opacity="0.6"/>
+                            <circle class="blue-flame-pulse" cx="0" cy="-5" r="12" fill="#168BFF" opacity="0.3" filter="url(#bluePulseBlur)"/>
+                            <path class="flame-inner" d="M 0 -16 C 5 -7 6 -1 0 2 C -6 -1 -5 -7 0 -16 Z" fill="url(#flameOrangeGrad)"/>
+                            <path class="flame-inner" d="M 0 -12 C 3.5 -5 4 0 0 1.5 C -4 0 -3.5 -5 0 -12 Z" fill="url(#flameYellowGrad)"/>
+                            <ellipse cx="0" cy="-2" rx="1.2" ry="3.5" fill="#FFFFFF"/>
+                        </g>
+                    </g>
+
+                    <g id="candleContainer2" transform="translate(187, 32)">
+                        <path d="M 0 5 L 6 5 L 6 46 L 0 46 Z" fill="url(#candleBodyGrad)"/>
+                        <line x1="3" y1="5" x2="3" y2="-2" stroke="#222" stroke-width="1.3" stroke-linecap="round"/>
+                        <g id="flameGroup2" class="flame-group" transform="translate(3, -2)">
+                            <ellipse class="flame-outer-glow" cx="0" cy="-8" rx="16" ry="22" fill="url(#flameAura)" opacity="0.65"/>
+                            <circle class="blue-flame-pulse" cx="0" cy="-7" r="14" fill="#168BFF" opacity="0.3" filter="url(#bluePulseBlur)" style="animation-delay:-0.8s"/>
+                            <path class="flame-inner" d="M 0 -20 C 6 -9 7 -1 0 2.5 C -7 -1 -6 -9 0 -20 Z" fill="url(#flameOrangeGrad)"/>
+                            <path class="flame-inner" d="M 0 -14 C 4 -6 4.5 0 0 1.8 C -4.5 0 -4 -6 0 -14 Z" fill="url(#flameYellowGrad)"/>
+                            <ellipse cx="0" cy="-3" rx="1.5" ry="4.5" fill="#FFFFFF"/>
+                        </g>
+                    </g>
+
+                    <g id="candleContainer3" transform="translate(224, 42)">
+                        <path d="M 0 5 L 6 5 L 6 38 L 0 38 Z" fill="url(#candleBodyGrad)"/>
+                        <line x1="3" y1="5" x2="3" y2="-1" stroke="#222" stroke-width="1.2" stroke-linecap="round"/>
+                        <g id="flameGroup3" class="flame-group" transform="translate(3, -1)">
+                            <ellipse class="flame-outer-glow" cx="0" cy="-6" rx="14" ry="18" fill="url(#flameAura)" opacity="0.6"/>
+                            <circle class="blue-flame-pulse" cx="0" cy="-5" r="12" fill="#168BFF" opacity="0.3" filter="url(#bluePulseBlur)"/>
+                            <path class="flame-inner" d="M 0 -16 C 5 -7 6 -1 0 2 C -6 -1 -5 -7 0 -16 Z" fill="url(#flameOrangeGrad)"/>
+                            <path class="flame-inner" d="M 0 -12 C 3.5 -5 4 0 0 1.5 C -4 0 -3.5 -5 0 -12 Z" fill="url(#flameYellowGrad)"/>
+                            <ellipse cx="0" cy="-2" rx="1.2" ry="3.5" fill="#FFFFFF"/>
+                        </g>
+                    </g>
+
+                    <defs>
+                        <filter id="bluePulseBlur" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3.5"/></filter>
+                        <radialGradient id="standShadowGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#0066B1" stop-opacity="0.5"/><stop offset="100%" stop-color="#000B1A" stop-opacity="0"/></radialGradient>
+                        <linearGradient id="goldPedestalGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#996515"/><stop offset="50%" stop-color="#D4AF37"/><stop offset="100%" stop-color="#8B6508"/></linearGradient>
+                        <linearGradient id="silverStem" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#718096"/><stop offset="50%" stop-color="#E2E8F0"/><stop offset="100%" stop-color="#4A5568"/></linearGradient>
+                        <linearGradient id="plateRimGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#64748B"/></linearGradient>
+                        <radialGradient id="glassReflection" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/><stop offset="100%" stop-color="#001738" stop-opacity="0.1"/></radialGradient>
+                        <linearGradient id="ivoryCreamGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#EDE4D3"/><stop offset="50%" stop-color="#FAF0E6"/><stop offset="100%" stop-color="#E2D5C3"/></linearGradient>
+                        <linearGradient id="royalBlueVelvet" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#001738"/><stop offset="50%" stop-color="#0055B8"/><stop offset="100%" stop-color="#00122E"/></linearGradient>
+                        <linearGradient id="royalBlueRibbon" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#001A40"/><stop offset="50%" stop-color="#0066B1"/><stop offset="100%" stop-color="#00102B"/></linearGradient>
+                        <linearGradient id="goldFoil" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#B8860B"/><stop offset="50%" stop-color="#FFD700"/><stop offset="100%" stop-color="#996515"/></linearGradient>
+                        <linearGradient id="candleBodyGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#E2E8F0"/><stop offset="50%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#CBD5E1"/></linearGradient>
+                        <radialGradient id="flameAura" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FF9900" stop-opacity="1"/><stop offset="100%" stop-color="#FF0000" stop-opacity="0"/></radialGradient>
+                        <linearGradient id="flameOrangeGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FF3300"/><stop offset="100%" stop-color="#FFAA00"/></linearGradient>
+                        <linearGradient id="flameYellowGrad" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#FFCC00"/><stop offset="100%" stop-color="#FFFFFF"/></linearGradient>
+                    </defs>
+                </svg>
+            </div>
+
+            <!-- CONTROLS -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-sm pt-2">
+                <button id="micBtn" onclick="toggleMicrophone()" class="w-full glass-btn py-3 px-5 rounded-xl text-xs font-semibold tracking-wider text-white uppercase flex items-center justify-center gap-2">
+                    <span id="micIcon">🎙️</span>
+                    <span id="micLabel">Enable Mic To Blow</span>
+                </button>
+                <button id="manualBlowBtn" onclick="simulateBlow()" class="w-full glass-btn py-3 px-5 rounded-xl text-xs font-semibold tracking-wider text-blue-200 uppercase flex items-center justify-center gap-2">
+                    <span>💨</span>
+                    <span>Blow Candles</span>
+                </button>
+            </div>
+
+            <div id="volumeMeterContainer" class="w-48 bg-white/10 rounded-full h-1.5 overflow-hidden opacity-0 transition-opacity duration-300">
+                <div id="volumeMeterBar" class="bg-gradient-to-r from-bmwBlue to-cyan-300 h-full w-0 transition-all duration-75"></div>
+            </div>
+        </section>
+
+        <!-- PAGE 2: LETTER -->
+        <section id="page2" class="w-full hidden opacity-0 translate-y-6 transition-all duration-1000 flex flex-col items-center justify-center my-4">
+            <div class="w-full max-w-2xl letter-card rounded-2xl p-8 sm:p-12 relative overflow-hidden text-slate-900 border border-slate-100">
+                <div class="w-12 h-1 bg-bmwBlue rounded-full mb-6"></div>
+                <div class="space-y-1 mb-6">
+                    <p class="text-xs uppercase tracking-[0.25em] font-semibold text-bmwBlue">A little birthday letter for you 🎈</p>
+                    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 pt-1">
+                        Hey!
+                    </h2>
+                </div>
+                <div class="space-y-4 text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
+                    <p class="font-semibold text-slate-900">Happy Birthday! 🥳</p>
+                    <p>It's a little funny that I'm sitting here from office writing a letter for someone I've only known for a few days. I will be writing this while you were sleeping.</p>
+                    <p>I don't know what are your plans for today, but you revieved some nice gifts, i barely know anything about you, to gift you.</p>
+                    <p>I wish to know to know more about you in upcoming days. I enjoy talking to you. I wish to hear how did your bday go today,</p>
+                    <p>I hope you had got enough reasons to smile today and let me add another to it.</p>
+                    <p>We might be in different cities.</p>
+                    <p>I will be there for you if anything, you can count on me, i promised myself not leaving you alone next time. Stand by your side.</p>
+                    <p>Anyway, I didn't want your birthday wish to be just another snapchat message disappearing into 24 hours. So here's something you can actually keep, if you want to. :)</p>
+                    <p>Have a lovely birthday. Take care of yourself, especially during those night shifts!</p>
+                </div>
+                <div class="mt-8 pt-6 border-t border-slate-100">
+                    <p class="text-base font-bold text-bmwBlue tracking-wide">Happy Birthday once again sirisha! ✨</p>
+                </div>
+            </div>
+
+            <button onclick="reliveCandles()" class="mt-8 text-xs text-blue-200/60 hover:text-white transition flex items-center gap-2">
+                <span>↺</span> Relive Candle Moment
+            </button>
+        </section>
+    </main>
+
+    <footer class="w-full py-4 text-center text-[11px] text-blue-200/30 tracking-wider uppercase">
+        Made with care for your birthday 💙✨🎂
+    </footer>
+
+    <!-- LOGIC & SOUND -->
+    <script>
+        let audioCtx = null, analyser = null, micStream = null, isBlownOut = false, micListening = false;
+        let blowVolumeHistory = [], micAnimationFrame = null, blowStartedAt = 0, ambientNoise = 0;
+
+        const flameGroups = [
+            document.getElementById('flameGroup1'),
+            document.getElementById('flameGroup2'),
+            document.getElementById('flameGroup3')
+        ];
+
+        async function toggleMicrophone() {
+            if (isBlownOut) return;
+            const micLabel = document.getElementById('micLabel');
+            const micIcon = document.getElementById('micIcon');
+            const micBtn = document.getElementById('micBtn');
+            const volumeMeterContainer = document.getElementById('volumeMeterContainer');
+
+            if (micListening) { stopMicrophone(); return; }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Microphone requires HTTPS or localhost.");
+                return;
+            }
+
+            micBtn.disabled = true;
+            micLabel.textContent = "Requesting Mic...";
+
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                if (!audioCtx || audioCtx.state === 'closed') {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+                const source = audioCtx.createMediaStreamSource(micStream);
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 2048;
+                analyser.smoothingTimeConstant = 0.15;
+                source.connect(analyser);
+
+                micListening = true;
+                blowVolumeHistory = [];
+                blowStartedAt = 0;
+                ambientNoise = 0;
+                micLabel.textContent = "Listening — blow at candles";
+                micIcon.textContent = "🌬️";
+                volumeMeterContainer.classList.remove('opacity-0');
+                micBtn.disabled = false;
+                processAudioAnalysis();
+            } catch (err) {
+                stopMicrophone();
+                micBtn.disabled = false;
+                alert("Microphone access was blocked or unavailable. You can use the Blow Candles button instead.");
+            }
+        }
+
+        function stopMicrophone() {
+            if (micAnimationFrame !== null) { cancelAnimationFrame(micAnimationFrame); micAnimationFrame = null; }
+            if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+            analyser = null;
+            micListening = false;
+            blowVolumeHistory = [];
+            const label = document.getElementById('micLabel');
+            const icon = document.getElementById('micIcon');
+            const meter = document.getElementById('volumeMeterContainer');
+            if (label) label.textContent = "Enable Mic To Blow";
+            if (icon) icon.textContent = "🎙️";
+            if (meter) {
+                meter.classList.add('opacity-0');
+                document.getElementById('volumeMeterBar').style.width = '0%';
+            }
+        }
+
+        function processAudioAnalysis() {
+            if (isBlownOut || !micListening || !analyser) return;
+            const samples = new Uint8Array(analyser.fftSize);
+            analyser.getByteTimeDomainData(samples);
+
+            let sumSquares = 0;
+            for (let i = 0; i < samples.length; i++) {
+                const centered = (samples[i] - 128) / 128;
+                sumSquares += centered * centered;
+            }
+            const rms = Math.sqrt(sumSquares / samples.length);
+            const level = Math.min(100, Math.round(rms * 360));
+            document.getElementById('volumeMeterBar').style.width = level + '%';
+
+            if (rms < 0.035) {
+                ambientNoise = ambientNoise === 0 ? rms : ambientNoise * 0.92 + rms * 0.08;
+            }
+
+            const threshold = Math.max(0.055, ambientNoise * 2.6);
+            if (rms > threshold) {
+                if (!blowStartedAt) blowStartedAt = performance.now();
+                blowVolumeHistory.push(rms);
+                if (blowVolumeHistory.length > 10) blowVolumeHistory.shift();
+
+                const avgBlow = blowVolumeHistory.reduce((a, b) => a + b, 0) / blowVolumeHistory.length;
+                if (avgBlow > threshold * 1.08 && (performance.now() - blowStartedAt) > 450 && blowVolumeHistory.length >= 5) {
+                    extinguishCandles();
+                    return;
+                }
+            } else {
+                blowStartedAt = 0;
+                blowVolumeHistory = [];
+            }
+            micAnimationFrame = requestAnimationFrame(processAudioAnalysis);
+        }
+
+        function simulateBlow() {
+            if (isBlownOut) return;
+            extinguishCandles();
+        }
+
+        function extinguishCandles() {
+            if (isBlownOut) return;
+            isBlownOut = true;
+            stopMicrophone();
+
+            // Hide Flames & Trigger Smoke Particles
+            flameGroups.forEach((flame, index) => {
+                if (flame) { flame.style.opacity = '0'; flame.style.transform = 'scale(0)'; }
+                const coords = [{ x: 153, y: 41 }, { x: 190, y: 30 }, { x: 227, y: 41 }];
+                createSmokeTrail(coords[index].x, coords[index].y);
+            });
+
+            // Play Subtle Party Wrapper Blast Sound[cite: 1]
+            playSubtlePartyBlastSound();
+
+            // Confetti Fireworks Explosion
+            triggerFireworks();
+
+            setTimeout(() => {
+                const page1 = document.getElementById('page1');
+                const page2 = document.getElementById('page2');
+                page1.classList.add('opacity-0', '-translate-y-6');
+                setTimeout(() => {
+                    page1.classList.add('hidden');
+                    page2.classList.remove('hidden');
+                    setTimeout(() => page2.classList.remove('opacity-0', 'translate-y-6'), 50);
+                }, 800);
+            }, 900);
+        }
+
+        // Subtle Party Wrapper Blast Sound Synthesizer[cite: 1]
+        function playSubtlePartyBlastSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                const now = audioCtx.currentTime;
+                const bufferSize = audioCtx.sampleRate * 0.35;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.08));
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(1200, now);
+                filter.Q.setValueAtTime(1.5, now);
+
+                const gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.25, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                noise.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                noise.start(now);
+            } catch (e) {
+                console.log("Audio playback prevented:", e);
+            }
+        }
+
+        function createSmokeTrail(svgX, svgY) {
+            const svg = document.getElementById('cakeSvg');
+            const rect = svg.getBoundingClientRect();
+            const scaleX = rect.width / 380, scaleY = rect.height / 380;
+            const originX = rect.left + svgX * scaleX, originY = rect.top + svgY * scaleY;
+
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => {
+                    const smoke = document.createElement('div');
+                    smoke.className = 'smoke-particle';
+                    const size = Math.random() * 12 + 10;
+                    const driftX = (Math.random() - 0.5) * 40;
+                    smoke.style.width = `${size}px`; smoke.style.height = `${size}px`;
+                    smoke.style.left = `${originX}px`; smoke.style.top = `${originY}px`;
+                    smoke.style.setProperty('--drift-x', `${driftX}px`);
+                    document.body.appendChild(smoke);
+                    setTimeout(() => smoke.remove(), 2800);
+                }, i * 140);
+            }
+        }
+
+        function triggerFireworks() {
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.65 }, colors: ['#0066B1', '#D4AF37', '#FAF0E6', '#64B5F6'] });
+            }
+        }
+
+        function reliveCandles() {
+            isBlownOut = false;
+            const page1 = document.getElementById('page1'), page2 = document.getElementById('page2');
+            page2.classList.add('opacity-0', 'translate-y-6');
+            setTimeout(() => {
+                page2.classList.add('hidden');
+                page1.classList.remove('hidden');
+                flameGroups.forEach(flame => { if (flame) { flame.style.opacity = '1'; flame.style.transform = ''; } });
+                setTimeout(() => page1.classList.remove('opacity-0', '-translate-y-6'), 50);
+            }, 800);
+        }
+    </script>
+</body>
+</html>
