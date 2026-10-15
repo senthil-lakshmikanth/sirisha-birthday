@@ -145,6 +145,8 @@
                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
                     Blow Out The Candles
                 </h1>
+                <p class="text-xs sm:text-sm text-blue-100/70 font-light leading-relaxed max-w-md mx-auto">
+                    Enable your microphone to blow out the flames, or use the blow button below.
                 </p>
             </div>
 
@@ -314,7 +316,16 @@
             micLabel.textContent = "Requesting Mic...";
 
             try {
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                // FIXED: Explicitly disable noise suppression and echo cancellation so blowing wind is detected!
+                micStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false
+                    }, 
+                    video: false 
+                });
+
                 if (!audioCtx || audioCtx.state === 'closed') {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 }
@@ -323,7 +334,7 @@
                 const source = audioCtx.createMediaStreamSource(micStream);
                 analyser = audioCtx.createAnalyser();
                 analyser.fftSize = 2048;
-                analyser.smoothingTimeConstant = 0.15;
+                analyser.smoothingTimeConstant = 0.1;
                 source.connect(analyser);
 
                 micListening = true;
@@ -370,21 +381,23 @@
                 sumSquares += centered * centered;
             }
             const rms = Math.sqrt(sumSquares / samples.length);
-            const level = Math.min(100, Math.round(rms * 360));
+            const level = Math.min(100, Math.round(rms * 450));
             document.getElementById('volumeMeterBar').style.width = level + '%';
 
-            if (rms < 0.035) {
-                ambientNoise = ambientNoise === 0 ? rms : ambientNoise * 0.92 + rms * 0.08;
+            if (rms < 0.05) {
+                ambientNoise = ambientNoise === 0 ? rms : ambientNoise * 0.9 + rms * 0.1;
             }
 
-            const threshold = Math.max(0.055, ambientNoise * 2.6);
+            // FIXED: Lowered threshold for much easier blow detection
+            const threshold = Math.max(0.025, ambientNoise * 1.5);
             if (rms > threshold) {
                 if (!blowStartedAt) blowStartedAt = performance.now();
                 blowVolumeHistory.push(rms);
-                if (blowVolumeHistory.length > 10) blowVolumeHistory.shift();
+                if (blowVolumeHistory.length > 8) blowVolumeHistory.shift();
 
                 const avgBlow = blowVolumeHistory.reduce((a, b) => a + b, 0) / blowVolumeHistory.length;
-                if (avgBlow > threshold * 1.08 && (performance.now() - blowStartedAt) > 450 && blowVolumeHistory.length >= 5) {
+                // FIXED: Reduced continuous duration check to 200ms so a quick puff works instantly
+                if (avgBlow > threshold && (performance.now() - blowStartedAt) > 200 && blowVolumeHistory.length >= 3) {
                     extinguishCandles();
                     return;
                 }
@@ -405,17 +418,13 @@
             isBlownOut = true;
             stopMicrophone();
 
-            // Hide Flames & Trigger Smoke Particles
             flameGroups.forEach((flame, index) => {
                 if (flame) { flame.style.opacity = '0'; flame.style.transform = 'scale(0)'; }
                 const coords = [{ x: 153, y: 41 }, { x: 190, y: 30 }, { x: 227, y: 41 }];
                 createSmokeTrail(coords[index].x, coords[index].y);
             });
 
-            // Play Subtle Party Wrapper Blast Sound[cite: 1]
             playSubtlePartyBlastSound();
-
-            // Confetti Fireworks Explosion
             triggerFireworks();
 
             setTimeout(() => {
@@ -430,7 +439,6 @@
             }, 900);
         }
 
-        // Subtle Party Wrapper Blast Sound Synthesizer[cite: 1]
         function playSubtlePartyBlastSound() {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -499,6 +507,7 @@
             page2.classList.add('opacity-0', 'translate-y-6');
             setTimeout(() => {
                 page2.classList.add('hidden');
+                page1.classList.add('hidden'); // safety reset
                 page1.classList.remove('hidden');
                 flameGroups.forEach(flame => { if (flame) { flame.style.opacity = '1'; flame.style.transform = ''; } });
                 setTimeout(() => page1.classList.remove('opacity-0', '-translate-y-6'), 50);
